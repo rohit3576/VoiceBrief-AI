@@ -1,17 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VoiceBrief AI</title>
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+  <div class="container">
+    <h2>🎙️ VoiceBrief AI</h2>
 
-  <h2>🎙️ VoiceBrief AI</h2>
+    <button id="recordBtn">Start Recording</button>
+    <button id="stopBtn" disabled>Stop</button>
 
-  <button id="recordBtn">Start Recording</button>
-  <button id="stopBtn" disabled>Stop</button>
+    <p id="status">Click “Start Recording”</p>
 
-  <p id="status"></p>
-  <audio id="player" controls></audio>
+    <!-- Transcription Output -->
+    <div id="result">
+      Transcript will appear here...
+    </div>
+
+    <audio id="player" controls></audio>
+
+    <footer>
+      Open-source • Free • AI-powered
+    </footer>
+  </div>
 
   <script src="script.js"></script>
 </body>
