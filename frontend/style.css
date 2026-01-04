@@ -214,3 +214,14 @@ footer {
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
+#summary {
+  margin-top: 10px;
+  padding: 10px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #a7f3d0;
+  text-align: left;
+}

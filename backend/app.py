@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from services.whisper_transcriber import transcribe_audio
+from services.summarizer import summarize_text
 import traceback
 import os
 
@@ -21,30 +22,40 @@ def serve_frontend():
     return send_from_directory(app.static_folder, "index.html")
 
 # -----------------------------
-# TRANSCRIPTION ENDPOINT
+# TRANSCRIBE + SUMMARIZE
 # -----------------------------
 @app.route("/transcribe", methods=["POST"])
 def transcribe():
     try:
         # Validate audio
         if "audio" not in request.files:
-            return jsonify({"success": False, "error": "No audio file provided"}), 400
+            return jsonify({
+                "success": False,
+                "error": "No audio file provided"
+            }), 400
 
         audio = request.files["audio"]
 
         if audio.filename == "":
-            return jsonify({"success": False, "error": "Empty filename"}), 400
+            return jsonify({
+                "success": False,
+                "error": "Empty filename"
+            }), 400
 
-        # Transcribe using Whisper
-        text = transcribe_audio(audio)
+        # 1️⃣ Whisper transcription
+        transcript = transcribe_audio(audio)
+
+        # 2️⃣ Summarization
+        summary = summarize_text(transcript)
 
         return jsonify({
             "success": True,
-            "transcript": text
+            "transcript": transcript,
+            "summary": summary
         })
 
     except Exception as e:
-        print("❌ Transcription error:")
+        print("❌ Processing error:")
         traceback.print_exc()
 
         return jsonify({
