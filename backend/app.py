@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+
 from services.whisper_transcriber import transcribe_audio
 from services.summarizer import summarize_text
 from services.knowledge_store import add_to_knowledge_base
+from services.qa_engine import answer_question
 
 import traceback
 import os
@@ -24,7 +26,7 @@ def serve_frontend():
     return send_from_directory(app.static_folder, "index.html")
 
 # -----------------------------
-# TRANSCRIBE + SUMMARIZE
+# TRANSCRIBE + SUMMARIZE + STORE
 # -----------------------------
 @app.route("/transcribe", methods=["POST"])
 def transcribe():
@@ -49,11 +51,10 @@ def transcribe():
 
         # 2️⃣ Summarization
         summary = summarize_text(transcript)
-        # Combine transcript + summary into knowledge
+
+        # 3️⃣ Store knowledge in FAISS
         knowledge_text = transcript + "\n\nSUMMARY:\n" + summary
-        # Store in FAISS knowledge base
         add_to_knowledge_base(knowledge_text)
-        
 
         return jsonify({
             "success": True,
@@ -64,7 +65,36 @@ def transcribe():
     except Exception as e:
         print("❌ Processing error:")
         traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 
+# -----------------------------
+# QUESTION ANSWERING (RAG)
+# -----------------------------
+@app.route("/ask", methods=["POST"])
+def ask():
+    try:
+        data = request.get_json()
+        question = data.get("question", "").strip()
+
+        if not question:
+            return jsonify({
+                "success": False,
+                "error": "Question is required"
+            }), 400
+
+        answer = answer_question(question)
+
+        return jsonify({
+            "success": True,
+            "answer": answer
+        })
+
+    except Exception as e:
+        print("❌ Question answering error:")
+        traceback.print_exc()
         return jsonify({
             "success": False,
             "error": str(e)
