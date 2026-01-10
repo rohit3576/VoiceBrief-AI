@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from services.whisper_transcriber import transcribe_audio
 from services.summarizer import summarize_text
+from services.knowledge_store import add_to_knowledge_base
+
 import traceback
 import os
 
@@ -47,6 +49,11 @@ def transcribe():
 
         # 2️⃣ Summarization
         summary = summarize_text(transcript)
+        # Combine transcript + summary into knowledge
+        knowledge_text = transcript + "\n\nSUMMARY:\n" + summary
+        # Store in FAISS knowledge base
+        add_to_knowledge_base(knowledge_text)
+        
 
         return jsonify({
             "success": True,
