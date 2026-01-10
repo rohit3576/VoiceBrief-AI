@@ -15,6 +15,9 @@ const player = document.getElementById("player");
 const resultBox = document.getElementById("result");
 const summaryBox = document.getElementById("summary");
 const container = document.querySelector(".container");
+const questionInput = document.getElementById("questionInput");
+const askBtn = document.getElementById("askBtn");
+const answerBox = document.getElementById("answer");
 
 // -----------------------------
 // LIQUID VISUALIZER
@@ -142,6 +145,42 @@ async function sendToBackend() {
     resultBox.innerText = err.message;
   }
 }
+
+// -----------------------------
+// ASK QUESTION (RAG)
+// -----------------------------
+askBtn.onclick = async () => {
+  const question = questionInput.value.trim();
+
+  if (!question) {
+    answerBox.innerText = "Please enter a question.";
+    return;
+  }
+
+  try {
+    answerBox.innerText = "🤖 Thinking...";
+
+    const response = await fetch("/ask", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ question })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || "Failed to get answer");
+    }
+
+    answerBox.innerText = data.answer;
+
+  } catch (error) {
+    console.error(error);
+    answerBox.innerText = "Error: " + error.message;
+  }
+};
 
 // -----------------------------
 // TYPEWRITER EFFECT

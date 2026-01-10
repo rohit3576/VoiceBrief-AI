@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VoiceBrief AI</title>
 
-  <!-- External CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -18,19 +17,30 @@
 
     <p id="status">Click “Start Recording”</p>
 
-    <!-- Transcript -->
     <h4>📝 Transcript</h4>
     <div id="result">
       Transcript will appear here...
     </div>
 
-    <!-- Summary -->
-    <h4 style="margin-top: 14px;">🧠 Summary</h4>
+    <h4>🧠 Summary</h4>
     <div id="summary">
       Summary will appear here...
     </div>
 
-    <!-- Audio Playback -->
+    <h4>💬 Ask a Question</h4>
+
+    <input
+      type="text"
+      id="questionInput"
+      placeholder="Ask something about your voice notes..."
+    />
+
+    <button id="askBtn">Ask</button>
+
+    <div id="answer">
+      Answer will appear here...
+    </div>
+
     <audio id="player" controls></audio>
 
     <footer>
