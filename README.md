@@ -95,14 +95,14 @@ macOS / Linux
 
 source venv/bin/activate
 
-3️⃣ Install Dependencies
+##3️⃣ Install Dependencies
 pip install -r backend/requirements.txt
 
 
 ⚠️ FFmpeg is required for Whisper
 Ensure ffmpeg -version works in your terminal.
 
-4️⃣ Run the Application
+##4️⃣ Run the Application
 python backend/app.py
 
 
