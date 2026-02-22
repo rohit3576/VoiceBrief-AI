@@ -1,21 +1,35 @@
 ```markdown
 # 🎙️ VoiceBrief AI
 
+<div align="center">
+
+**Transform your voice into concise summaries — completely free and open-source**
+
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-2.0%2B-green)](https://flask.palletsprojects.com/)
+[![Whisper](https://img.shields.io/badge/Whisper-OpenAI-yellow)](https://github.com/openai/whisper)
+[![Hugging Face](https://img.shields.io/badge/🤗-Transformers-orange)](https://huggingface.co/)
+[![License](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)
+
 **VoiceBrief AI** is a fully open-source, voice-driven productivity web application that records audio in the browser, transcribes speech using open-source Whisper, and generates concise summaries using transformer-based NLP models — all with **zero paid APIs**.
 
 > Built for real-world usage, interviews, and deployment — not just demos.
 
+</div>
+
 ---
 
-## 🚀 Features
+## ✨ Features
 
-- 🎤 **In-browser voice recording** (MediaRecorder API)
-- 🌊 **Live audio visualization** (liquid glass effect)
-- 🧠 **Speech-to-Text** using open-source **Whisper**
-- 📝 **Automatic summarization** using **BART (facebook/bart-large-cnn)**
-- ⚡ Real-time transcript & summary display
-- 🧩 Clean modular backend architecture
-- 💸 **100% free & open-source stack**
+| | Feature | Description |
+|---|---|---|
+| 🎤 | **Voice Recording** | In-browser audio capture with MediaRecorder API |
+| 🌊 | **Live Visualization** | Liquid glass audio effect with Web Audio API |
+| 🧠 | **Speech-to-Text** | OpenAI's Whisper (base model) - completely local |
+| 📝 | **Smart Summarization** | BART transformer model for concise summaries |
+| ⚡ | **Real-time Display** | Instant transcript and summary generation |
+| 💸 | **Zero Cost** | 100% free, no paid APIs, fully open-source |
+| 🧩 | **Modular Design** | Clean architecture for easy customization |
 
 ---
 
@@ -38,8 +52,8 @@ Transcript + Summary shown on UI
 ## 🛠️ Tech Stack
 
 ### Frontend
-- HTML
-- CSS (Glassmorphism UI)
+- HTML5
+- CSS3 (Glassmorphism UI)
 - JavaScript
 - MediaRecorder API
 - Web Audio API
@@ -56,7 +70,7 @@ Transcript + Summary shown on UI
 
 ---
 
-## 📁 Project Structure
+## 📂 Project Structure
 
 ```
 VoiceBrief-AI/
@@ -112,15 +126,28 @@ source venv/bin/activate
 pip install -r backend/requirements.txt
 ```
 
-⚠️ **FFmpeg is required for Whisper**  
-Ensure `ffmpeg -version` works in your terminal.
+### 4️⃣ Install FFmpeg
 
-**Install FFmpeg:**
-- **macOS:** `brew install ffmpeg`
-- **Ubuntu/Debian:** `sudo apt install ffmpeg`
-- **Windows:** Download from [ffmpeg.org](https://ffmpeg.org/download.html)
+**macOS:**
+```bash
+brew install ffmpeg
+```
 
-### 4️⃣ Run the Application
+**Ubuntu/Debian:**
+```bash
+sudo apt update
+sudo apt install ffmpeg
+```
+
+**Windows:**
+Download from [ffmpeg.org](https://ffmpeg.org/download.html) and add to PATH
+
+Verify installation:
+```bash
+ffmpeg -version
+```
+
+### 5️⃣ Run the Application
 
 ```bash
 python backend/app.py
@@ -139,23 +166,30 @@ http://127.0.0.1:5000
 - Daily voice notes
 - Brain dumps & idea capture
 - Interview prep recordings
-- Productivity & task recall
+- Lecture recording
+- Task management
 
 ---
 
-## 🧪 Example Output
+## 📊 Example Output
 
 **Transcript**  
-*"Today I discussed project milestones and planned to complete the API integration by Friday."*
+*"Today I discussed project milestones with the team. We decided to complete the API integration by Friday, and Sarah will handle the frontend components. The client meeting is scheduled for next Monday at 10 AM."*
 
 **Summary**  
-*"The speaker reviewed project milestones and set a deadline to finish API integration by Friday."*
+*"Team discussed project milestones, with API integration deadline set for Friday and Sarah assigned to frontend work. Client meeting scheduled for Monday at 10 AM."*
 
 ---
 
-## 🏆 Resume-Ready Description
+## 🏆 Description
 
-Developed VoiceBrief AI, a full-stack open-source voice intelligence application that records audio in the browser, transcribes speech using Whisper, and generates summaries using transformer-based NLP models, served via a Flask backend.
+**VoiceBrief AI** - Full-stack Voice Intelligence Application
+- Developed a production-grade voice processing web app using Flask and modern JavaScript
+- Integrated OpenAI's Whisper model for accurate speech-to-text transcription
+- Implemented BART transformer for intelligent text summarization
+- Created responsive glassmorphism UI with real-time audio visualization
+- Architected modular backend services for easy maintenance and scaling
+- Achieved zero-cost deployment using only open-source technologies
 
 ---
 
@@ -169,12 +203,14 @@ Developed VoiceBrief AI, a full-stack open-source voice intelligence application
 - Multi-language support
 - Export to markdown/PDF
 - Mobile app version
+- User authentication
+- Dark mode
 
 ---
 
 ## 🤝 Contributing
 
-Pull requests are welcome! For major changes, please open an issue first to discuss improvements.
+Pull requests are welcome! For major changes, please open an issue first.
 
 **Steps to contribute:**
 1. Fork the repository
@@ -187,16 +223,19 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 ## ⚠️ Known Issues & Troubleshooting
 
-- **First run may be slow** - Models need to download (~1.5GB total)
-- **Memory usage** - Ensure you have at least 4GB RAM free
-- **Audio quality** - Better results with clear speech and minimal background noise
-- **Browser permissions** - Allow microphone access when prompted
+| Issue | Solution |
+|-------|----------|
+| **Slow first run** | Models need to download (~1.5GB total). Be patient! |
+| **High memory usage** | Ensure 4GB+ RAM available |
+| **Poor transcription** | Use clear speech, minimize background noise |
+| **Microphone not working** | Check browser permissions |
+| **FFmpeg not found** | Verify FFmpeg installation |
 
 ---
 
 ## 📜 License
 
-This project is licensed under the MIT License — free to use, modify, and distribute.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 
@@ -211,7 +250,13 @@ This project is licensed under the MIT License — free to use, modify, and dist
 
 ## 📞 Contact
 
-For questions or feedback:
-- Open an issue on GitHub
-- Email: [rohit03576@gmail.com]
+📧 **Email:** rohit03576@gmail.com
 
+🐛 **Report Issues:** GitHub Issues
+
+⭐ **Star this repo** if you find it useful!
+
+---
+
+**Made with ❤️ for the open-source community**
+```
