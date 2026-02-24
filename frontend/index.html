@@ -1,53 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VoiceBrief AI</title>
-
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceBrief AI - YouTube Podcast Summarizer</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-  <div class="container">
-    <h2>🎙️ VoiceBrief AI</h2>
-
-    <button id="recordBtn">Start Recording</button>
-    <button id="stopBtn" disabled>Stop</button>
-
-    <p id="status">Click “Start Recording”</p>
-
-    <h4>📝 Transcript</h4>
-    <div id="result">
-      Transcript will appear here...
+    <div class="container">
+        <h1>🎙️ VoiceBrief AI</h1>
+        <p class="subtitle">Record your voice or paste a YouTube link to get instant summaries</p>
+        
+        <!-- Tabs for switching between Microphone and YouTube -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('microphone')">🎤 Microphone</button>
+            <button class="tab-btn" onclick="switchTab('youtube')">📹 YouTube</button>
+        </div>
+        
+        <!-- Microphone Tab -->
+        <div id="microphone-tab" class="tab-content active">
+            <div class="recorder-container">
+                <div class="visualizer-container">
+                    <canvas id="visualizer"></canvas>
+                </div>
+                
+                <div class="controls">
+                    <button id="recordBtn" class="record-btn">🎤 Start Recording</button>
+                    <button id="stopBtn" class="stop-btn" disabled>⏹️ Stop</button>
+                </div>
+                
+                <div id="recordingStatus" class="status">Ready to record</div>
+            </div>
+        </div>
+        
+        <!-- YouTube Tab -->
+        <div id="youtube-tab" class="tab-content">
+            <div class="youtube-container">
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="youtubeUrl" 
+                        placeholder="Paste YouTube URL here... (e.g., https://youtu.be/... or https://youtube.com/watch?v=...)"
+                    >
+                    <button id="processYoutubeBtn" class="process-btn">📥 Process Video</button>
+                </div>
+                
+                <div id="videoInfo" class="video-info" style="display: none;">
+                    <h3 id="videoTitle"></h3>
+                    <p id="videoStats"></p>
+                </div>
+                
+                <div id="youtubeStatus" class="status"></div>
+            </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="results-container">
+            <!-- Transcript Card -->
+            <div class="result-card">
+                <h3>📝 Transcript</h3>
+                <div id="transcript" class="content-box">
+                    <p class="placeholder">Your transcript will appear here...</p>
+                </div>
+            </div>
+            
+            <!-- Summary Card -->
+            <div class="result-card">
+                <h3>📋 Summary</h3>
+                <div id="summary" class="content-box">
+                    <p class="placeholder">Your summary will appear here...</p>
+                </div>
+            </div>
+            
+            <!-- Key Points Card (shown only for YouTube) -->
+            <div class="result-card" id="keyPointsCard" style="display: none;">
+                <h3>🔑 Key Points</h3>
+                <div id="keyPoints" class="content-box">
+                    <ul class="key-points-list"></ul>
+                </div>
+            </div>
+            
+            <!-- Q&A Card -->
+            <div class="result-card">
+                <h3>❓ Ask Questions</h3>
+                <div class="qa-container">
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="question" 
+                            placeholder="Ask a question about the content..."
+                        >
+                        <button id="askBtn" class="ask-btn" disabled>Ask</button>
+                    </div>
+                    <div id="answer" class="answer-box">
+                        <p class="placeholder">Answers will appear here...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Audio Player (hidden by default) -->
+        <audio id="player" controls style="display: none;"></audio>
+        
+        <!-- Footer -->
+        <footer>
+            <p>Open-source • Free • AI-powered • Built with ❤️</p>
+        </footer>
     </div>
-
-    <h4>🧠 Summary</h4>
-    <div id="summary">
-      Summary will appear here...
-    </div>
-
-    <h4>💬 Ask a Question</h4>
-
-    <input
-      type="text"
-      id="questionInput"
-      placeholder="Ask something about your voice notes..."
-    />
-
-    <button id="askBtn">Ask</button>
-
-    <div id="answer">
-      Answer will appear here...
-    </div>
-
-    <audio id="player" controls></audio>
-
-    <footer>
-      Open-source • Free • AI-powered
-    </footer>
-  </div>
-
-  <script src="script.js"></script>
+    
+    <script src="script.js"></script>
 </body>
 </html>
