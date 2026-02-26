@@ -1,140 +1,106 @@
-import os
-import uuid
-from flask import Flask, request, jsonify, send_from_directory
-from flask_cors import CORS
-from services.whisper_transcriber import WhisperTranscriber
-from services.summarizer import Summarizer
-from services.youtube_service import YouTubeService
+# backend/services/summarizer.py
+from transformers import pipeline
 import logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__, static_folder='../frontend', static_url_path='')
-CORS(app)
-
-# Configure upload folder
-UPLOAD_FOLDER = 'uploads'
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Initialize services
-transcriber = WhisperTranscriber()
-summarizer = Summarizer()
-youtube_service = YouTubeService()
-
-@app.route('/')
-def index():
-    return send_from_directory('../frontend', 'index.html')
-
-@app.route('/<path:path>')
-def serve_frontend(path):
-    return send_from_directory('../frontend', path)
-
-@app.route('/transcribe', methods=['POST'])
-def transcribe_audio():
-    """Handle audio file upload and transcription"""
-    try:
-        if 'audio' not in request.files:
-            return jsonify({'error': 'No audio file provided'}), 400
-        
-        audio_file = request.files['audio']
-        if audio_file.filename == '':
-            return jsonify({'error': 'Empty filename'}), 400
-        
-        # Save uploaded file
-        filename = str(uuid.uuid4()) + '.webm'
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        audio_file.save(filepath)
-        
-        # Transcribe
-        logger.info(f"Transcribing audio: {filepath}")
-        transcript = transcriber.transcribe(filepath)
-        
-        # Generate summary
-        logger.info("Generating summary...")
-        summary = summarizer.summarize(transcript)
-        
-        # Clean up
-        os.remove(filepath)
-        
-        return jsonify({
-            'success': True,
-            'transcript': transcript,
-            'summary': summary,
-            'source': 'microphone'
-        })
-        
-    except Exception as e:
-        logger.error(f"Error in transcribe_audio: {str(e)}")
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/process-youtube', methods=['POST'])
-def process_youtube():
-    """Handle YouTube URL processing"""
-    try:
-        data = request.get_json()
-        url = data.get('url', '')
-        
-        if not url:
-            return jsonify({'error': 'No URL provided'}), 400
-        
-        # Extract video ID
-        video_id = youtube_service.extract_video_id(url)
-        if not video_id:
-            return jsonify({'error': 'Invalid YouTube URL'}), 400
-        
-        # Get transcript
-        result = youtube_service.get_transcript(video_id)
-        
-        if not result['success']:
-            return jsonify({'error': result['error']}), 400
-        
-        # Generate summary
-        summary = summarizer.summarize(result['transcript'])
-        
-        # Generate key points (optional)
-        key_points = summarizer.extract_key_points(result['transcript'])
-        
-        return jsonify({
-            'success': True,
-            'video_id': video_id,
-            'title': result.get('title', 'YouTube Video'),
-            'transcript': result['transcript'],
-            'summary': summary,
-            'key_points': key_points,
-            'language': result.get('language', 'en'),
-            'source': 'youtube'
-        })
-        
-    except Exception as e:
-        logger.error(f"Error in process_youtube: {str(e)}")
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/ask', methods=['POST'])
-def ask_question():
-    """Handle questions about the content"""
-    try:
-        data = request.get_json()
-        question = data.get('question', '')
-        context = data.get('context', '')
-        
-        if not question or not context:
-            return jsonify({'error': 'Question and context required'}), 400
-        
-        # Simple QA implementation (you can enhance this)
-        # For now, we'll use summarizer to find relevant parts
-        answer = summarizer.answer_question(context, question)
-        
-        return jsonify({
-            'success': True,
-            'answer': answer
-        })
-        
-    except Exception as e:
-        logger.error(f"Error in ask_question: {str(e)}")
-        return jsonify({'error': str(e)}), 500
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+class Summarizer:
+    def __init__(self):
+        logger.info("Loading summarization model...")
+        self.summarizer = pipeline(
+            "summarization",
+            model="facebook/bart-large-cnn",
+            device=-1  # CPU
+        )
+        logger.info("Summarization model loaded successfully")
+    
+    def summarize(self, text, max_length=150, min_length=30):
+        """Generate summary from text"""
+        try:
+            if not text or len(text.split()) < 20:
+                return "Text too short for summarization"
+            
+            # Adjust max_length based on input length
+            input_length = len(text.split())
+            max_len = min(max_length, input_length // 2)
+            min_len = min(min_length, max_len // 2)
+            
+            summary = self.summarizer(
+                text[:1024],  # Limit input size
+                max_length=max_len,
+                min_length=min_len,
+                do_sample=False
+            )
+            return summary[0]['summary_text']
+        except Exception as e:
+            logger.error(f"Summarization error: {str(e)}")
+            return f"Error generating summary: {str(e)}"
+    
+    def extract_key_points(self, text, num_points=5):
+        """Extract key points from text"""
+        try:
+            # Simple sentence tokenization
+            sentences = text.split('. ')
+            
+            # Score sentences by length and position
+            scored_sentences = []
+            for i, sentence in enumerate(sentences):
+                if len(sentence.split()) > 5:  # Filter very short sentences
+                    # Give higher score to sentences at beginning
+                    position_score = 1.0
+                    if i < len(sentences) * 0.2:  # First 20%
+                        position_score = 1.5
+                    
+                    # Length score (prefer medium-length sentences)
+                    word_count = len(sentence.split())
+                    if 8 <= word_count <= 25:
+                        length_score = 1.2
+                    else:
+                        length_score = 0.8
+                    
+                    total_score = position_score * length_score
+                    scored_sentences.append((sentence, total_score))
+            
+            # Sort by score and get top points
+            scored_sentences.sort(key=lambda x: x[1], reverse=True)
+            key_points = [s[0] for s in scored_sentences[:num_points]]
+            
+            return key_points
+        except Exception as e:
+            logger.error(f"Key points extraction error: {str(e)}")
+            return []
+    
+    def answer_question(self, context, question):
+        """Simple QA by finding relevant sentences"""
+        try:
+            # Convert to lowercase for matching
+            context_lower = context.lower()
+            question_lower = question.lower()
+            
+            # Split into sentences
+            sentences = context.split('. ')
+            
+            # Find sentences containing question keywords
+            keywords = set(question_lower.split())
+            relevant_sentences = []
+            
+            for sentence in sentences:
+                sentence_lower = sentence.lower()
+                # Count how many keywords are in this sentence
+                matches = sum(1 for word in keywords if word in sentence_lower and len(word) > 3)
+                if matches >= 1:  # At least 1 keyword matches
+                    relevant_sentences.append((sentence, matches))
+            
+            # Sort by relevance
+            relevant_sentences.sort(key=lambda x: x[1], reverse=True)
+            
+            if relevant_sentences:
+                # Return top 2 most relevant sentences
+                answer = '. '.join([s[0] for s in relevant_sentences[:2]])
+                return answer
+            else:
+                return "I couldn't find a specific answer to your question in the content."
+                
+        except Exception as e:
+            logger.error(f"Question answering error: {str(e)}")
+            return f"Error processing question: {str(e)}"
